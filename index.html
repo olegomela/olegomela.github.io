@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Warehouse – offline inventory movement accounting for Windows, macOS, Linux and Android</title>
+<meta name="description" content="Free, simple inventory movement accounting between departments: receipts, issues, returns, write-offs and balances at any date. Works offline on Windows, macOS, Linux and Android. No account, your data stays on your device.">
+<meta name="keywords" content="inventory, warehouse, stock accounting, inventory movement, stock balance, offline, free, Windows, macOS, Linux, Android, barcode, облік складу, склад">
+<meta property="og:title" content="Warehouse – offline inventory movement accounting">
+<meta property="og:description" content="Free and simple: receipts, issues, returns, write-offs and balances at any date. Windows, macOS, Linux, Android.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://olegomela.github.io/">
+<meta property="og:image" content="https://olegomela.github.io/screenshots/2-wh-desktop-transfers.png">
+<link rel="canonical" href="https://olegomela.github.io/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%235f9a45'/%3E%3Ctext x='32' y='42' font-family='Arial,sans-serif' font-weight='700' font-size='28' fill='%23ffff00' text-anchor='middle'%3EWH%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #f6f8f4; --surface: #ffffff; --text: #1d2a17; --muted: #55624f;
+    --border: #dfe6da; --accent: #5f9a45; --accent-strong: #4a7d34; --accent-text: #ffffff;
+    --note: #fff8e1; --note-border: #f0d77a; --code: #eef2eb;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141912; --surface: #1d241a; --text: #e4ecdf; --muted: #a3b09c;
+      --border: #2e3a29; --accent: #78b65b; --accent-strong: #8fc775; --accent-text: #10160d;
+      --note: #2c2814; --note-border: #6b5b1c; --code: #263022;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 16px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
+  a { color: var(--accent-strong); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 14px 0; border-bottom: 1px solid var(--border); background: var(--surface); }
+  header .wrap { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 20px; text-decoration: none; color: var(--text); }
+  .langs { margin-left: auto; display: flex; gap: 4px; flex-wrap: wrap; }
+  .langs button { border: 1px solid var(--border); background: transparent; color: var(--text);
+    border-radius: 8px; padding: 4px 9px; font: inherit; font-size: 14px; cursor: pointer; }
+  .langs button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+  .hero { padding-top: 48px; padding-bottom: 32px; }
+  .hero h1 { font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 14px; }
+  .hero p { font-size: 18px; color: var(--muted); max-width: 720px; margin: 0 0 24px; }
+  .btn { display: inline-block; background: var(--accent); color: var(--accent-text); text-decoration: none;
+    padding: 11px 20px; border-radius: 10px; font-weight: 600; }
+  .btn:hover { background: var(--accent-strong); }
+  .btn.secondary { background: transparent; color: var(--accent-strong); border: 1px solid var(--accent); }
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  section { padding: 28px 0; }
+  h2 { font-size: 26px; margin: 0 0 18px; }
+  .grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 18px; }
+  .card h3 { margin: 0 0 6px; font-size: 17px; }
+  .card p { margin: 0; color: var(--muted); }
+  .icon { font-size: 24px; margin-bottom: 6px; }
+  .platform { display: flex; flex-direction: column; gap: 8px; }
+  .platform .file { font-family: ui-monospace, Consolas, monospace; font-size: 14px; color: var(--muted); }
+  .platform .btn { margin-top: auto; text-align: center; }
+  /* Two columns, desktop | Android, one screen per row so the pairs line up; one column on phones. */
+  .shots { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; align-items: start; }
+  .shots h3 { margin: 0; font-size: 17px; }
+  .shots a { display: block; }
+  .shots img { width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border); display: block; }
+  @media (max-width: 700px) {
+    .shots { grid-template-columns: 1fr; }
+    .shots .android { order: 1; }
+  }
+  details { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px; margin-bottom: 10px; }
+  summary { cursor: pointer; font-weight: 600; }
+  details p, details li { color: var(--muted); }
+  code { background: var(--code); padding: 1px 6px; border-radius: 6px; font-size: 14px; word-break: break-all; }
+  .note { background: var(--note); border: 1px solid var(--note-border); border-radius: 12px; padding: 12px 16px; }
+  footer { border-top: 1px solid var(--border); padding: 22px 0 36px; color: var(--muted); font-size: 14px; }
+  @media (max-width: 560px) { .hero { padding-top: 32px; } .langs { margin-left: 0; } }
+</style>
+</head>
+<body>
+
+<script>
+  /* ---- Settings: edit these before publishing ---- */
+  const SETTINGS = {
+    version: "1.4.4",
+    // Direct links to the files of the current release: update them, and version, with every release.
+    windows: "https://github.com/olegomela/warehouse-releases-windows/releases/download/v1.4.4/warehouse-1.4.4.msi",
+    macos: "https://github.com/olegomela/warehouse-releases-macos/releases/download/v1.4.4/warehouse-1.4.4.dmg",
+    linux: "https://github.com/olegomela/warehouse-releases-linux/releases/download/v1.4.4/warehouse_1.4.4_amd64.deb",
+    android: "https://github.com/olegomela/warehouse-releases-android/releases/download/v1.4.4/warehouse-10404.apk",
+    email: "mksmpl@ukr.net"
+  };
+</script>
+
+<header>
+  <div class="wrap">
+    <a class="brand" href="#">
+      <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#5f9a45"/><text x="32" y="42" font-family="Arial,sans-serif" font-weight="700" font-size="28" fill="#ffff00" text-anchor="middle">WH</text></svg>
+      Warehouse
+    </a>
+    <nav class="langs" aria-label="Language">
+      <button type="button" data-lang="en" lang="en">English</button>
+      <button type="button" data-lang="uk" lang="uk">Українська</button>
+      <button type="button" data-lang="de" lang="de">Deutsch</button>
+      <button type="button" data-lang="fr" lang="fr">Français</button>
+      <button type="button" data-lang="es" lang="es">Español</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <h1 data-i18n="heroTitle">Simple inventory movement accounting</h1>
+    <p data-i18n="heroText">Record receipts, issues, returns and write-offs between your departments and see the balances at any moment. Free, works offline, for Windows, macOS, Linux and Android.</p>
+    <div class="actions">
+      <a class="btn" href="#download" data-i18n="ctaDownload">Download</a>
+      <a class="btn secondary" href="#features" data-i18n="ctaFeatures">What it can do</a>
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="wrap">
+      <h2 data-i18n="featuresTitle">What it can do</h2>
+      <div class="grid">
+        <div class="card"><div class="icon">🔁</div><h3 data-i18n="f1t">Transfers</h3><p data-i18n="f1">Every movement of products and materials between departments: receipts from suppliers, issues to consumers, returns, write-offs. Each transfer keeps the balances it leaves behind.</p></div>
+        <div class="card"><div class="icon">📊</div><h3 data-i18n="f2t">Balances at any moment</h3><p data-i18n="f2">Balances of every department and product at the beginning or end of a period or on any date, with or without cost.</p></div>
+        <div class="card"><div class="icon">📅</div><h3 data-i18n="f3t">Accounting periods</h3><p data-i18n="f3">Close a period to fix its transfers, look back at closed periods, reopen the last one if needed.</p></div>
+        <div class="card"><div class="icon">📄</div><h3 data-i18n="f4t">Export</h3><p data-i18n="f4">Export any table to PDF, Excel, Word or OpenDocument; on Android also to CSV.</p></div>
+        <div class="card"><div class="icon">📷</div><h3 data-i18n="f5t">Barcode scanning (Android)</h3><p data-i18n="f5">Scan a barcode or QR code on the product or its packaging to add it to the product name, or to find the product when recording a transfer.</p></div>
+        <div class="card"><div class="icon">💻📱</div><h3 data-i18n="f6t">Computer and phone</h3><p data-i18n="f6">Move databases between the desktop and Android versions as ZIP files. Before replacing a database, the app warns if changes would be lost.</p></div>
+        <div class="card"><div class="icon">🛟</div><h3 data-i18n="f7t">Backups and sample data</h3><p data-i18n="f7">Several databases, backups with restore, undo of the last deletion, and a sample database to try everything right away.</p></div>
+        <div class="card"><div class="icon">🌐</div><h3 data-i18n="f8t">Five languages</h3><p data-i18n="f8">English, Ukrainian, German, French and Spanish; light and dark theme.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screenshots">
+    <div class="wrap">
+      <h2 data-i18n="shotsTitle">Screenshots (dark theme)</h2>
+      <div class="shots">
+        <h3 data-i18n="shotsDesktop">Computer (Windows, macOS, Linux)</h3>
+        <h3 class="android">Android</h3>
+        <a href="screenshots/1-wh-desktop-start.png" target="_blank"><img src="screenshots/1-wh-desktop-start.png" alt="Start on a desktop" width="1546" height="873" loading="lazy" data-shot></a>
+        <a class="android" href="screenshots/1-wh-android-start.jpg" target="_blank"><img src="screenshots/1-wh-android-start.jpg" alt="Start on Android" width="1920" height="1200" loading="lazy" data-shot></a>
+        <a href="screenshots/2-wh-desktop-transfers.png" target="_blank"><img src="screenshots/2-wh-desktop-transfers.png" alt="Transfers on a desktop" width="1546" height="873" loading="lazy" data-shot></a>
+        <a class="android" href="screenshots/2-wh-android-transfers.jpg" target="_blank"><img src="screenshots/2-wh-android-transfers.jpg" alt="Transfers on Android" width="1920" height="1200" loading="lazy" data-shot></a>
+        <a href="screenshots/3-wh-desktop-balances.png" target="_blank"><img src="screenshots/3-wh-desktop-balances.png" alt="Balances on a desktop" width="1546" height="873" loading="lazy" data-shot></a>
+        <a class="android" href="screenshots/3-wh-android-balances.jpg" target="_blank"><img src="screenshots/3-wh-android-balances.jpg" alt="Balances on Android" width="1920" height="1200" loading="lazy" data-shot></a>
+        <a href="screenshots/4-wh-desktop-products.png" target="_blank"><img src="screenshots/4-wh-desktop-products.png" alt="Products on a desktop" width="1546" height="873" loading="lazy" data-shot></a>
+        <a class="android" href="screenshots/4-wh-android-products.jpg" target="_blank"><img src="screenshots/4-wh-android-products.jpg" alt="Products on Android" width="1920" height="1200" loading="lazy" data-shot></a>
+        <a href="screenshots/5-wh-desktop-departments.png" target="_blank"><img src="screenshots/5-wh-desktop-departments.png" alt="Departments on a desktop" width="1546" height="873" loading="lazy" data-shot></a>
+        <a class="android" href="screenshots/5-wh-android-departments.jpg" target="_blank"><img src="screenshots/5-wh-android-departments.jpg" alt="Departments on Android" width="1920" height="1200" loading="lazy" data-shot></a>
+        <a href="screenshots/6-wh-desktop-persons.png" target="_blank"><img src="screenshots/6-wh-desktop-persons.png" alt="Persons on a desktop" width="1546" height="873" loading="lazy" data-shot></a>
+        <a class="android" href="screenshots/6-wh-android-persons.jpg" target="_blank"><img src="screenshots/6-wh-android-persons.jpg" alt="Persons on Android" width="1920" height="1200" loading="lazy" data-shot></a>
+      </div>
+    </div>
+  </section>
+
+  <section id="download">
+    <div class="wrap">
+      <h2 data-i18n="downloadTitle">Download</h2>
+      <div class="grid">
+        <div class="card platform">
+          <h3>Windows</h3><span class="file">.msi</span>
+          <p data-i18n="winReq">Windows 10 or newer.</p>
+          <a class="btn" data-link="windows" href="#" data-i18n="get">Download</a>
+        </div>
+        <div class="card platform">
+          <h3>macOS</h3><span class="file">.dmg</span>
+          <p data-i18n="macReq">A recent version of macOS.</p>
+          <a class="btn" data-link="macos" href="#" data-i18n="get">Download</a>
+        </div>
+        <div class="card platform">
+          <h3>Linux</h3><span class="file">.deb</span>
+          <p data-i18n="linuxReq">Debian, Ubuntu, Linux Mint and other Debian-based systems.</p>
+          <a class="btn" data-link="linux" href="#" data-i18n="get">Download</a>
+        </div>
+        <div class="card platform">
+          <h3>Android</h3><span class="file">.apk</span>
+          <p data-i18n="androidReq">Android 8 or newer, phones and tablets.</p>
+          <a class="btn" data-link="android" href="#" data-i18n="get">Download</a>
+        </div>
+      </div>
+      <p><span data-i18n="versionLabel">Current version:</span> <strong data-version></strong>. <span data-i18n="releasesNote">The download pages also list earlier versions and the SHA-256 checksums of the files.</span></p>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="wrap">
+      <h2 data-i18n="installTitle">Installation</h2>
+      <p class="note" data-i18n="unsignedNote">The installers are free and not signed with paid publisher certificates, so Windows, macOS and Android show a warning the first time. Download only from the links on this page and check the checksum if you like (see below).</p>
+      <details>
+        <summary>Windows</summary>
+        <p data-i18n="winSteps">Run the .msi file. If “Windows protected your PC” appears, click “More info” and then “Run anyway”.</p>
+      </details>
+      <details>
+        <summary>macOS</summary>
+        <p data-i18n="macSteps">Open the .dmg file and drag Warehouse into Applications. On the first start macOS blocks the app because it is not notarized by Apple: open System Settings › Privacy &amp; Security, scroll down and click “Open Anyway”, then confirm.</p>
+      </details>
+      <details>
+        <summary>Linux</summary>
+        <p data-i18n="linuxSteps">Install the downloaded file in a terminal, from the folder where it is saved:</p>
+        <p><code>sudo apt install ./warehouse_*.deb</code></p>
+      </details>
+      <details>
+        <summary>Android</summary>
+        <p data-i18n="androidSteps">Open the downloaded .apk file. If Android asks, allow your browser or file manager to install unknown apps. Updates install over the previous version and keep your data.</p>
+        <p class="note" data-i18n="androidUninstall">Uninstalling the app deletes its databases. Before uninstalling, save every database you need with “Export for desktop (ZIP)”.</p>
+      </details>
+      <details>
+        <summary data-i18n="desktopWindowTitle">How the desktop version opens</summary>
+        <p data-i18n="desktopWindow">The desktop version opens in its own window of Google Chrome, Microsoft Edge or Brave, so one of these browsers should be installed (on Linux: Chrome, Chromium or Brave). Without them it opens in Firefox on Windows or in Safari on macOS. The app itself runs only on your computer.</p>
+      </details>
+      <details>
+        <summary data-i18n="checksumTitle">Checking a download (SHA-256)</summary>
+        <p data-i18n="checksumText">Compare the result with the checksum listed on the download page:</p>
+        <ul>
+          <li>Windows (PowerShell): <code>Get-FileHash .\file.msi</code></li>
+          <li>macOS: <code>shasum -a 256 file.dmg</code></li>
+          <li>Linux: <code>sha256sum file.deb</code></li>
+        </ul>
+      </details>
+    </div>
+  </section>
+
+  <section id="privacy">
+    <div class="wrap">
+      <h2 data-i18n="privacyTitle">Your data stays with you</h2>
+      <div class="card">
+        <p data-i18n="privacyText">Warehouse works fully offline. There is no account, no advertising, and the app does not collect or send your data: your databases are stored only on your device. On Android, barcode scanning uses Google's scanner from Google Play services where it is available.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <h2 data-i18n="contactTitle">Questions and suggestions</h2>
+      <p><span data-i18n="contactText">Write to us:</span> <a data-email href="#"></a></p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">Warehouse · <span data-version></span></div>
+</footer>
+
+<script>
+var T = {
+  uk: {
+    heroTitle: "Простий облік переміщень на складі",
+    heroText: "Фіксуйте надходження, видачу, повернення та списання між вашими підрозділами й бачте залишки на будь-який момент. Безкоштовно, без інтернету, для Windows, macOS, Linux і Android.",
+    ctaDownload: "Завантажити", ctaFeatures: "Можливості", featuresTitle: "Можливості",
+    f1t: "Переміщення", f1: "Кожне переміщення продуктів і матеріалів між підрозділами: надходження від постачальників, видача споживачам, повернення, списання. Кожне переміщення зберігає залишки, які після нього утворилися.",
+    f2t: "Залишки на будь-який момент", f2: "Залишки кожного підрозділу й продукту на початок чи кінець періоду або на будь-яку дату, з вартістю чи без.",
+    f3t: "Облікові періоди", f3: "Закрийте період, щоб зафіксувати його переміщення, переглядайте закриті періоди, за потреби відкрийте останній.",
+    f4t: "Експорт", f4: "Експорт будь-якої таблиці в PDF, Excel, Word або OpenDocument; на Android також у CSV.",
+    f5t: "Сканування кодів (Android)", f5: "Скануйте штрихкод чи QR-код на продукті або упаковці, щоб додати його до найменування продукту або знайти продукт під час запису переміщення.",
+    f6t: "Комп'ютер і телефон", f6: "Переносьте бази даних між комп'ютерною та Android-версіями як ZIP-файли. Перед заміною бази Додаток попереджає, якщо зміни буде втрачено.",
+    f7t: "Резервні копії та демонстраційна база", f7: "Кілька баз даних, резервні копії з відновленням, скасування останнього видалення та демонстраційна база, щоб одразу все спробувати.",
+    f8t: "П'ять мов", f8: "Англійська, українська, німецька, французька та іспанська; світла й темна теми.",
+    shotsTitle: "Знімки екрана (темна тема)", shotsDesktop: "Комп'ютер (Windows, macOS, Linux)", downloadTitle: "Завантаження",
+    winReq: "Windows 10 або новіша.", macReq: "Актуальна версія macOS.", linuxReq: "Debian, Ubuntu, Linux Mint та інші системи на основі Debian.", androidReq: "Android 8 або новіший, телефони й планшети.",
+    get: "Завантажити", versionLabel: "Поточна версія:", releasesNote: "На сторінках завантаження також є попередні версії та контрольні суми SHA-256 файлів.",
+    installTitle: "Встановлення",
+    unsignedNote: "Інсталятори безкоштовні й не підписані платними сертифікатами видавця, тому Windows, macOS і Android під час першого запуску показують попередження. Завантажуйте лише за посиланнями з цієї сторінки та за бажання перевірте контрольну суму (див. нижче).",
+    winSteps: "Запустіть файл .msi. Якщо з'явиться «Windows захистила ваш ПК», натисніть «Докладніше», а потім «Усе одно запустити».",
+    macSteps: "Відкрийте файл .dmg і перетягніть Warehouse у Програми. Під час першого запуску macOS блокує Додаток, бо він не нотаризований Apple: відкрийте Системні параметри › Приватність і безпека, прокрутіть униз, натисніть «Усе одно відкрити» й підтвердьте.",
+    linuxSteps: "Встановіть завантажений файл у терміналі з папки, де він збережений:",
+    androidSteps: "Відкрийте завантажений файл .apk. Якщо Android попросить, дозвольте браузеру чи файловому менеджеру встановлювати невідомі застосунки. Оновлення встановлюються поверх попередньої версії й зберігають ваші дані.",
+    androidUninstall: "Видалення Додатку видаляє його бази даних. Перед видаленням збережіть кожну потрібну базу через «Експорт для комп'ютера (ZIP)».",
+    desktopWindowTitle: "Як відкривається комп'ютерна версія",
+    desktopWindow: "Комп'ютерна версія відкривається у власному вікні Google Chrome, Microsoft Edge або Brave, тож один із цих браузерів має бути встановлений (у Linux: Chrome, Chromium або Brave). Без них вона відкривається у Firefox у Windows або в Safari в macOS. Сам Додаток працює лише на вашому комп'ютері.",
+    checksumTitle: "Перевірка завантаження (SHA-256)", checksumText: "Порівняйте результат із контрольною сумою на сторінці завантаження:",
+    privacyTitle: "Ваші дані залишаються у вас",
+    privacyText: "Warehouse повністю працює без інтернету. Немає облікового запису, немає реклами, Додаток не збирає й не надсилає ваші дані: бази даних зберігаються лише на вашому пристрої. На Android сканування кодів використовує сканер Google із сервісів Google Play, якщо вони доступні.",
+    contactTitle: "Запитання та пропозиції", contactText: "Пишіть нам:"
+  },
+  de: {
+    heroTitle: "Einfache Erfassung von Lagerbewegungen",
+    heroText: "Erfassen Sie Eingänge, Ausgaben, Rückgaben und Abschreibungen zwischen Ihren Abteilungen und sehen Sie die Bestände zu jedem Zeitpunkt. Kostenlos, offline, für Windows, macOS, Linux und Android.",
+    ctaDownload: "Herunterladen", ctaFeatures: "Funktionen", featuresTitle: "Funktionen",
+    f1t: "Umlagerungen", f1: "Jede Bewegung von Produkten und Material zwischen Abteilungen: Eingänge von Lieferanten, Ausgaben an Abnehmer, Rückgaben, Abschreibungen. Jede Umlagerung speichert die danach verbleibenden Bestände.",
+    f2t: "Bestände zu jedem Zeitpunkt", f2: "Bestände jeder Abteilung und jedes Produkts am Anfang oder Ende einer Periode oder zu einem beliebigen Datum, mit oder ohne Wert.",
+    f3t: "Buchungsperioden", f3: "Schließen Sie eine Periode ab, um ihre Umlagerungen festzuschreiben, sehen Sie sich abgeschlossene Perioden an und öffnen Sie bei Bedarf die letzte wieder.",
+    f4t: "Export", f4: "Export jeder Tabelle als PDF, Excel, Word oder OpenDocument; unter Android auch als CSV.",
+    f5t: "Barcode-Scan (Android)", f5: "Scannen Sie einen Barcode oder QR-Code auf dem Produkt oder seiner Verpackung, um ihn dem Produktnamen hinzuzufügen oder das Produkt beim Erfassen einer Umlagerung zu finden.",
+    f6t: "Computer und Smartphone", f6: "Übertragen Sie Datenbanken als ZIP-Dateien zwischen der Desktop- und der Android-Version. Vor dem Ersetzen einer Datenbank warnt die Anwendung, wenn Änderungen verloren gingen.",
+    f7t: "Sicherungen und Beispieldaten", f7: "Mehrere Datenbanken, Sicherungen mit Wiederherstellung, Rückgängigmachen des letzten Löschens und eine Beispieldatenbank zum sofortigen Ausprobieren.",
+    f8t: "Fünf Sprachen", f8: "Englisch, Ukrainisch, Deutsch, Französisch und Spanisch; helles und dunkles Design.",
+    shotsTitle: "Bildschirmfotos (dunkles Design)", shotsDesktop: "Computer (Windows, macOS, Linux)", downloadTitle: "Herunterladen",
+    winReq: "Windows 10 oder neuer.", macReq: "Eine aktuelle macOS-Version.", linuxReq: "Debian, Ubuntu, Linux Mint und andere Debian-basierte Systeme.", androidReq: "Android 8 oder neuer, Smartphones und Tablets.",
+    get: "Herunterladen", versionLabel: "Aktuelle Version:", releasesNote: "Die Download-Seiten enthalten auch frühere Versionen und die SHA-256-Prüfsummen der Dateien.",
+    installTitle: "Installation",
+    unsignedNote: "Die Installationsdateien sind kostenlos und nicht mit kostenpflichtigen Herausgeberzertifikaten signiert, daher zeigen Windows, macOS und Android beim ersten Mal eine Warnung. Laden Sie nur über die Links dieser Seite herunter und prüfen Sie bei Bedarf die Prüfsumme (siehe unten).",
+    winSteps: "Starten Sie die .msi-Datei. Erscheint „Der Computer wurde durch Windows geschützt“, klicken Sie auf „Weitere Informationen“ und dann auf „Trotzdem ausführen“.",
+    macSteps: "Öffnen Sie die .dmg-Datei und ziehen Sie Warehouse in „Programme“. Beim ersten Start blockiert macOS die App, weil sie nicht von Apple notarisiert ist: Öffnen Sie Systemeinstellungen › Datenschutz & Sicherheit, scrollen Sie nach unten, klicken Sie auf „Dennoch öffnen“ und bestätigen Sie.",
+    linuxSteps: "Installieren Sie die heruntergeladene Datei im Terminal aus dem Ordner, in dem sie gespeichert ist:",
+    androidSteps: "Öffnen Sie die heruntergeladene .apk-Datei. Fragt Android danach, erlauben Sie Ihrem Browser oder Dateimanager, unbekannte Apps zu installieren. Updates werden über die vorherige Version installiert und behalten Ihre Daten.",
+    androidUninstall: "Beim Deinstallieren der App werden ihre Datenbanken gelöscht. Sichern Sie vorher jede benötigte Datenbank mit „Für Desktop exportieren (ZIP)“.",
+    desktopWindowTitle: "Wie die Desktop-Version startet",
+    desktopWindow: "Die Desktop-Version öffnet sich in einem eigenen Fenster von Google Chrome, Microsoft Edge oder Brave; einer dieser Browser sollte installiert sein (unter Linux: Chrome, Chromium oder Brave). Ohne sie öffnet sie sich unter Windows in Firefox oder unter macOS in Safari. Die Anwendung selbst läuft nur auf Ihrem Computer.",
+    checksumTitle: "Download prüfen (SHA-256)", checksumText: "Vergleichen Sie das Ergebnis mit der Prüfsumme auf der Download-Seite:",
+    privacyTitle: "Ihre Daten bleiben bei Ihnen",
+    privacyText: "Warehouse funktioniert vollständig offline. Es gibt kein Konto, keine Werbung, und die App sammelt oder sendet Ihre Daten nicht: Ihre Datenbanken werden nur auf Ihrem Gerät gespeichert. Unter Android nutzt der Barcode-Scan den Scanner von Google aus den Google Play-Diensten, sofern verfügbar.",
+    contactTitle: "Fragen und Vorschläge", contactText: "Schreiben Sie uns:"
+  },
+  fr: {
+    heroTitle: "Comptabilité simple des mouvements de stock",
+    heroText: "Enregistrez réceptions, sorties, retours et radiations entre vos départements et consultez les soldes à tout moment. Gratuit, hors ligne, pour Windows, macOS, Linux et Android.",
+    ctaDownload: "Télécharger", ctaFeatures: "Fonctionnalités", featuresTitle: "Fonctionnalités",
+    f1t: "Transferts", f1: "Chaque mouvement de produits et de matériaux entre départements : réceptions des fournisseurs, sorties vers les consommateurs, retours, radiations. Chaque transfert conserve les soldes qu'il laisse.",
+    f2t: "Soldes à tout moment", f2: "Soldes de chaque département et de chaque produit au début ou à la fin d'une période ou à n'importe quelle date, avec ou sans coût.",
+    f3t: "Périodes comptables", f3: "Clôturez une période pour figer ses transferts, consultez les périodes clôturées, rouvrez la dernière si nécessaire.",
+    f4t: "Export", f4: "Export de n'importe quel tableau en PDF, Excel, Word ou OpenDocument ; sur Android aussi en CSV.",
+    f5t: "Scan de codes (Android)", f5: "Scannez un code-barres ou un code QR sur le produit ou son emballage pour l'ajouter au nom du produit ou pour trouver le produit lors de la saisie d'un transfert.",
+    f6t: "Ordinateur et téléphone", f6: "Transférez les bases de données entre les versions bureau et Android sous forme de fichiers ZIP. Avant de remplacer une base, l'application prévient si des modifications seraient perdues.",
+    f7t: "Sauvegardes et données d'exemple", f7: "Plusieurs bases de données, sauvegardes avec restauration, annulation de la dernière suppression et une base d'exemple pour tout essayer tout de suite.",
+    f8t: "Cinq langues", f8: "Anglais, ukrainien, allemand, français et espagnol ; thème clair et sombre.",
+    shotsTitle: "Captures d'écran (thème sombre)", shotsDesktop: "Ordinateur (Windows, macOS, Linux)", downloadTitle: "Téléchargement",
+    winReq: "Windows 10 ou plus récent.", macReq: "Une version récente de macOS.", linuxReq: "Debian, Ubuntu, Linux Mint et autres systèmes basés sur Debian.", androidReq: "Android 8 ou plus récent, téléphones et tablettes.",
+    get: "Télécharger", versionLabel: "Version actuelle :", releasesNote: "Les pages de téléchargement proposent aussi les versions précédentes et les sommes de contrôle SHA-256 des fichiers.",
+    installTitle: "Installation",
+    unsignedNote: "Les programmes d'installation sont gratuits et ne sont pas signés avec des certificats d'éditeur payants : Windows, macOS et Android affichent donc un avertissement la première fois. Téléchargez uniquement via les liens de cette page et vérifiez la somme de contrôle si vous le souhaitez (voir ci-dessous).",
+    winSteps: "Lancez le fichier .msi. Si « Windows a protégé votre ordinateur » apparaît, cliquez sur « Informations complémentaires » puis sur « Exécuter quand même ».",
+    macSteps: "Ouvrez le fichier .dmg et faites glisser Warehouse dans Applications. Au premier lancement, macOS bloque l'application car elle n'est pas notarisée par Apple : ouvrez Réglages Système › Confidentialité et sécurité, faites défiler vers le bas, cliquez sur « Ouvrir quand même » puis confirmez.",
+    linuxSteps: "Installez le fichier téléchargé dans un terminal, depuis le dossier où il est enregistré :",
+    androidSteps: "Ouvrez le fichier .apk téléchargé. Si Android le demande, autorisez votre navigateur ou gestionnaire de fichiers à installer des applications inconnues. Les mises à jour s'installent par-dessus la version précédente et conservent vos données.",
+    androidUninstall: "La désinstallation de l'application supprime ses bases de données. Avant de désinstaller, enregistrez chaque base nécessaire avec « Exporter pour le bureau (ZIP) ».",
+    desktopWindowTitle: "Comment s'ouvre la version bureau",
+    desktopWindow: "La version bureau s'ouvre dans sa propre fenêtre de Google Chrome, Microsoft Edge ou Brave ; l'un de ces navigateurs doit donc être installé (sous Linux : Chrome, Chromium ou Brave). Sans eux, elle s'ouvre dans Firefox sous Windows ou dans Safari sous macOS. L'application elle-même fonctionne uniquement sur votre ordinateur.",
+    checksumTitle: "Vérifier un téléchargement (SHA-256)", checksumText: "Comparez le résultat avec la somme de contrôle indiquée sur la page de téléchargement :",
+    privacyTitle: "Vos données restent chez vous",
+    privacyText: "Warehouse fonctionne entièrement hors ligne. Pas de compte, pas de publicité, et l'application ne collecte ni n'envoie vos données : vos bases de données sont stockées uniquement sur votre appareil. Sur Android, le scan de codes utilise le scanner de Google des services Google Play lorsqu'il est disponible.",
+    contactTitle: "Questions et suggestions", contactText: "Écrivez-nous :"
+  },
+  es: {
+    heroTitle: "Contabilidad sencilla de movimientos de inventario",
+    heroText: "Registre entradas, salidas, devoluciones y bajas entre sus departamentos y vea los saldos en cualquier momento. Gratis, sin conexión, para Windows, macOS, Linux y Android.",
+    ctaDownload: "Descargar", ctaFeatures: "Funciones", featuresTitle: "Funciones",
+    f1t: "Transferencias", f1: "Cada movimiento de productos y materiales entre departamentos: recepciones de proveedores, entregas a consumidores, devoluciones, bajas. Cada transferencia guarda los saldos que deja.",
+    f2t: "Saldos en cualquier momento", f2: "Saldos de cada departamento y producto al inicio o al final de un periodo o en cualquier fecha, con o sin coste.",
+    f3t: "Periodos contables", f3: "Cierre un periodo para fijar sus transferencias, consulte los periodos cerrados y vuelva a abrir el último si hace falta.",
+    f4t: "Exportación", f4: "Exportación de cualquier tabla a PDF, Excel, Word u OpenDocument; en Android también a CSV.",
+    f5t: "Escaneo de códigos (Android)", f5: "Escanee un código de barras o QR del producto o de su envase para añadirlo al nombre del producto o para encontrar el producto al registrar una transferencia.",
+    f6t: "Ordenador y teléfono", f6: "Traslade bases de datos entre las versiones de escritorio y Android como archivos ZIP. Antes de reemplazar una base, la aplicación avisa si se perderían cambios.",
+    f7t: "Copias de seguridad y datos de ejemplo", f7: "Varias bases de datos, copias de seguridad con restauración, deshacer la última eliminación y una base de ejemplo para probarlo todo enseguida.",
+    f8t: "Cinco idiomas", f8: "Inglés, ucraniano, alemán, francés y español; tema claro y oscuro.",
+    shotsTitle: "Capturas de pantalla (tema oscuro)", shotsDesktop: "Ordenador (Windows, macOS, Linux)", downloadTitle: "Descarga",
+    winReq: "Windows 10 o posterior.", macReq: "Una versión reciente de macOS.", linuxReq: "Debian, Ubuntu, Linux Mint y otros sistemas basados en Debian.", androidReq: "Android 8 o posterior, teléfonos y tabletas.",
+    get: "Descargar", versionLabel: "Versión actual:", releasesNote: "Las páginas de descarga también incluyen versiones anteriores y las sumas de verificación SHA-256 de los archivos.",
+    installTitle: "Instalación",
+    unsignedNote: "Los instaladores son gratuitos y no están firmados con certificados de editor de pago, por eso Windows, macOS y Android muestran una advertencia la primera vez. Descargue solo desde los enlaces de esta página y, si lo desea, compruebe la suma de verificación (ver abajo).",
+    winSteps: "Ejecute el archivo .msi. Si aparece «Windows protegió su PC», haga clic en «Más información» y luego en «Ejecutar de todas formas».",
+    macSteps: "Abra el archivo .dmg y arrastre Warehouse a Aplicaciones. En el primer inicio macOS bloquea la aplicación porque no está notarizada por Apple: abra Ajustes del Sistema › Privacidad y seguridad, desplácese hacia abajo, haga clic en «Abrir igualmente» y confirme.",
+    linuxSteps: "Instale el archivo descargado en un terminal, desde la carpeta donde está guardado:",
+    androidSteps: "Abra el archivo .apk descargado. Si Android lo pide, permita que su navegador o gestor de archivos instale aplicaciones desconocidas. Las actualizaciones se instalan sobre la versión anterior y conservan sus datos.",
+    androidUninstall: "Desinstalar la aplicación elimina sus bases de datos. Antes de desinstalarla, guarde cada base que necesite con «Exportar para escritorio (ZIP)».",
+    desktopWindowTitle: "Cómo se abre la versión de escritorio",
+    desktopWindow: "La versión de escritorio se abre en su propia ventana de Google Chrome, Microsoft Edge o Brave, así que uno de estos navegadores debe estar instalado (en Linux: Chrome, Chromium o Brave). Sin ellos se abre en Firefox en Windows o en Safari en macOS. La aplicación en sí funciona solo en su ordenador.",
+    checksumTitle: "Comprobar una descarga (SHA-256)", checksumText: "Compare el resultado con la suma de verificación indicada en la página de descarga:",
+    privacyTitle: "Sus datos se quedan con usted",
+    privacyText: "Warehouse funciona completamente sin conexión. No hay cuenta ni publicidad, y la aplicación no recopila ni envía sus datos: sus bases de datos se guardan solo en su dispositivo. En Android, el escaneo de códigos usa el escáner de Google de los servicios de Google Play cuando está disponible.",
+    contactTitle: "Preguntas y sugerencias", contactText: "Escríbanos:"
+  }
+};
+
+(function () {
+  var english = {};
+  document.querySelectorAll("[data-i18n]").forEach(function (el) { english[el.dataset.i18n] = el.textContent; });
+  var supported = ["en", "uk", "de", "fr", "es"];
+
+  function apply(lang) {
+    var texts = T[lang] || {};
+    document.querySelectorAll("[data-i18n]").forEach(function (el) {
+      el.textContent = texts[el.dataset.i18n] || english[el.dataset.i18n];
+    });
+    document.documentElement.lang = lang;
+    document.querySelectorAll(".langs button").forEach(function (b) {
+      b.setAttribute("aria-pressed", String(b.dataset.lang === lang));
+    });
+    try { localStorage.setItem("warehouse-lang", lang); } catch (e) { /* storage unavailable */ }
+  }
+
+  var saved = null;
+  try { saved = localStorage.getItem("warehouse-lang"); } catch (e) { /* storage unavailable */ }
+  var browser = (navigator.language || "en").slice(0, 2).toLowerCase();
+  apply(supported.indexOf(saved) >= 0 ? saved : supported.indexOf(browser) >= 0 ? browser : "en");
+  document.querySelectorAll(".langs button").forEach(function (b) {
+    b.addEventListener("click", function () { apply(b.dataset.lang); });
+  });
+
+  document.querySelectorAll("[data-link]").forEach(function (a) { a.href = SETTINGS[a.dataset.link]; });
+  document.querySelectorAll("[data-version]").forEach(function (el) { el.textContent = SETTINGS.version; });
+  document.querySelectorAll("[data-email]").forEach(function (a) {
+    a.href = "mailto:" + SETTINGS.email; a.textContent = SETTINGS.email;
+  });
+
+  // The screenshots section appears once an image exists next to this page (screenshots/…).
+  document.querySelectorAll("[data-shot]").forEach(function (img) {
+    img.addEventListener("load", function () { document.getElementById("screenshots").hidden = false; });
+    img.addEventListener("error", function () { (img.closest("a") || img).remove(); });
+  });
+})();
+</script>
+</body>
+</html>
